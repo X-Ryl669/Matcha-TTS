@@ -11,6 +11,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import wget
+from PIL import Image
+import io 
 from omegaconf import DictConfig
 
 from matcha.utils import pylogger, rich_utils
@@ -135,11 +137,20 @@ def intersperse(lst, item):
     return result
 
 
-def save_figure_to_numpy(fig):
-    data = np.fromstring(fig.canvas.tostring_rgb(), dtype=np.uint8, sep="")
-    data = data.reshape(fig.canvas.get_width_height()[::-1] + (3,))
-    return data
+#def save_figure_to_numpy(fig):
+#    data = np.fromstring(fig.canvas.tostring_rgb(), dtype=np.uint8, sep="")
+#    data = data.reshape(fig.canvas.get_width_height()[::-1] + (3,))
+#    return data
 
+def save_figure_to_numpy(fig):
+    buf = io.BytesIO()
+    fig.savefig(buf, format='png', bbox_inches='tight', pad_inches=0)
+    buf.seek(0)
+    img = Image.open(buf)
+    data = np.array(img)
+    buf.close()
+    
+    return data
 
 def plot_tensor(tensor):
     plt.style.use("default")

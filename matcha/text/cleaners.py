@@ -25,7 +25,7 @@ critical_logger.setLevel(logging.CRITICAL)
 # now the phonemizer is not initialising at every call
 # Might be less flexible, but it is much-much faster
 global_phonemizer = phonemizer.backend.EspeakBackend(
-    language="en-us",
+    language="fr-fr",
     preserve_punctuation=True,
     with_stress=True,
     language_switch="remove-flags",
@@ -142,3 +142,19 @@ def ipa_simplifier(text):
 #     phonemes = "".join(piper_phonemize.phonemize_espeak(text=text, voice="en-US")[0])
 #     phonemes = collapse_whitespace(phonemes)
 #     return phonemes
+
+import piper_phonemize
+def french_cleaners_piper(text):
+    """Pipeline for French text, including abbreviation expansion. + punctuation + stress"""
+    #text = convert_to_ascii(text)
+    text = lowercase(text)
+    text = expand_abbreviations(text)
+    phonemes = "".join(piper_phonemize.phonemize_espeak(text=text, voice="fr")[0])
+    phonemes = remove_brackets(phonemes)
+    phonemes = collapse_whitespace(phonemes)
+    
+    # Remove unwanted symbols (e.g., '1')
+    unwanted_symbols = {'1', '-'}  # Add any other unwanted symbols here
+    filtered_phonemes = "".join([char for char in phonemes if char not in unwanted_symbols])
+    
+    return filtered_phonemes

@@ -1,3 +1,5 @@
+import sys
+
 """ from https://github.com/keithito/tacotron """
 from matcha.text import cleaners
 from matcha.text.symbols import symbols
@@ -23,7 +25,11 @@ def text_to_sequence(text, cleaner_names):
 
     clean_text = _clean_text(text, cleaner_names)
     for symbol in clean_text:
-        symbol_id = _symbol_to_id[symbol]
+        try:
+          symbol_id = _symbol_to_id[symbol]
+        except:
+          print(f"Symbol {symbol} not found in the symbol list\n")
+          sys.exit()
         sequence += [symbol_id]
     return sequence, clean_text
 
