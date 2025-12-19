@@ -1,0 +1,1 @@
+/home/cyril/.pyenv/versions/3.10.19/lib/python3.10/site-packages/matcha_tts-0.0.7.2-py3.10-linux-x86_64.egg/matcha/utils/generate_data_statistics.py

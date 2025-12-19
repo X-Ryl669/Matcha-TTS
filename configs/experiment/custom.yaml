@@ -11,4 +11,4 @@ defaults:
 
 tags: ["ljspeech"]
 
-run_name: ljspeech
+run_name: custom

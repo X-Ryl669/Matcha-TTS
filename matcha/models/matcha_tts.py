@@ -1,6 +1,7 @@
 import datetime as dt
 import math
 import random
+import os
 
 import torch
 
@@ -108,8 +109,11 @@ class MatchaTTS(BaseLightningClass):  # 🍵
                 # Real-time factor
             }
         """
-        # For RTF computation
-        t = dt.datetime.now()
+        skip_rtf = os.getenv("SKIP_COMPUTE_RTF", 0)
+        t = 0
+        if int(skip_rtf) != 1:
+            # For RTF computation
+            t = dt.datetime.now()
 
         if self.n_spks > 1:
             # Get speaker embedding
@@ -138,7 +142,8 @@ class MatchaTTS(BaseLightningClass):  # 🍵
         decoder_outputs = self.decoder(mu_y, y_mask, n_timesteps, temperature, spks)
         decoder_outputs = decoder_outputs[:, :, :y_max_length]
 
-        t = (dt.datetime.now() - t).total_seconds()
+        if int(skip_rtf) != 1:
+            t = (dt.datetime.now() - t).total_seconds()
         rtf = t * 22050 / (decoder_outputs.shape[-1] * 256)
 
         return {
