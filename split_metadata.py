@@ -1,7 +1,7 @@
 import random
 
 # File paths
-input_file = "Dataset/allNonEmptySentences.csv"
+input_file = "Dataset/checkedSentences.csv"
 train_file = "Dataset/train.txt"
 validation_file = "Dataset/val.txt"
 test_file = "Dataset/test.txt"

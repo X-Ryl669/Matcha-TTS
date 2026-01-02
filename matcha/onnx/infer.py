@@ -8,6 +8,7 @@ import numpy as np
 import onnxruntime as ort
 import soundfile as sf
 import torch
+import librosa
 
 from matcha.cli import plot_spectrogram_to_numpy, process_text
 
@@ -38,7 +39,29 @@ def write_wavs(model, inputs, output_dir, external_vocoder=None):
         vocoder_t0 = perf_counter()
         wavs = external_vocoder.run(None, vocoder_inputs)[0]
         vocoder_infer_secs = perf_counter() - vocoder_t0
-        wavs = wavs.squeeze(1)
+        print(f"Type: {type(wavs)} {wavs.ndim}\nSize: {wavs.size} {wavs.shape}\nContent: {wavs}")
+        try:
+            wavs = wavs.squeeze(1)
+        except:
+            if wavs.ndim == 3:
+                print("Compute iFFT")
+                S = torch.from_numpy(wavs).squeeze().cpu().numpy()
+
+                # Convert log-magnitude back to linear magnitude (if it was log-scaled)
+#                S_linear = np.exp(S)
+
+                # Reconstruct the waveform using Griffin-Lim
+                wavs = librosa.griffinlim(
+                    S,
+                    hop_length=256,
+                    win_length=1024,
+                    n_iter=32  # More iterations = better quality but slower
+                )
+                wavs = [wavs]
+            else:
+                print("Direct use of signal")
+#                wavs = wavs[0]
+#            pass
         wav_lengths = mel_lengths * 256
         infer_secs = mel_infer_secs + vocoder_infer_secs
 
